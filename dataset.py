@@ -40,4 +40,8 @@ def get_dataset(arg):
         val_split = Subset(trainset, val_indices)
         train_split = Subset(trainset, train_indices)
         trainloader = DataLoader(train_split, batch_size=128, shuffle=True, num_workers=2, pin_memory=True)
+        single_trainloader = DataLoader(train_split, batch_size=1, shuffle=True, num_workers=2, pin_memory=True)
         testloader = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+        single_testloader = DataLoader(testset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True)
+
+        return trainloader, testloader, val_split, single_trainloader, single_testloader
