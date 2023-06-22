@@ -1,6 +1,8 @@
 # Iteration (Epoch) Learned
 Iteration (Epoch) learned is a metric of example difficulty.
-It is proposed in the paper: [An Empirical Study of Example Forgetting during Deep Neural Network Learning](https://arxiv.org/abs/1812.05159).
+It is proposed in the paper: [An Empirical Study of Example Forgetting during Deep Neural Network Learning](https://arxiv.org/abs/1812.05159) by the authors defining **Forgetting and learning events**.
+
+**Iteration Learned** is defined as a separated metric in hte paper: [Deep Learning Through the Lens of Example Difficulty](https://arxiv.org/abs/2106.09647).
 
 Bibtex: 
 ```
@@ -18,6 +20,8 @@ class at iteration $t = \tau − 1$ is different from the final prediction of th
 predictions at all iterations $t ≥ \tau$ are equal to the final prediction of the converged network. Data
 points consistently classified after all training steps and at the moment of initialization, are said to be
 learned in step $t = 0$.
+
+This defination 
 
 # Implementation:
 
