@@ -13,7 +13,7 @@ Bibtex:
 ```
 # **Iteration Learned** is defined as: 
 
-A data point is said to be learned by a classifier at training iteration $t = \tau$ if the predicted
+> A data point is said to be learned by a classifier at training iteration $t = \tau$ if the predicted
 class at iteration $t = \tau − 1$ is different from the final prediction of the converged network and the
 predictions at all iterations $t ≥ \tau$ are equal to the final prediction of the converged network. Data
 points consistently classified after all training steps and at the moment of initialization, are said to be
