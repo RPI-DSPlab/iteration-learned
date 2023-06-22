@@ -20,12 +20,12 @@ def parse_arguments():
     parser.add_argument('--num_samples', type=int, default=10000, help='Number of samples')
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes')
     parser.add_argument('--crit', type=str, default='cross_entropy', help='Loss criterion')
-    parser.add_argument('learned_metric', type=str, default='epoch', help='Iteration Learned or Epoch Learned')
+    parser.add_argument('--learned_metric', type=str, default='epoch', help='Iteration Learned or Epoch Learned')
 
     # Other configurations
     parser.add_argument('--seeds', nargs='+', type=int, default=[9203, 9304, 9837, 9612, 3456, 5210],
                         help='Seed values')
     parser.add_argument('--log_interval', type=int, default=10, help='Log interval')
-    parser.add_argument('--save_model', type=bool, default=False, help='Save model')
+    parser.add_argument('--result_dir', type=str, default='results', help='Result directory')
 
     return parser.parse_args()

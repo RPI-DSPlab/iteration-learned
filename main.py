@@ -1,4 +1,6 @@
 import torch
+from torchvision.models import vgg16
+
 import models
 import os
 import numpy as np
@@ -7,12 +9,13 @@ import argparse
 import config
 import dataset
 
-def trainer(trainloader, testloader, model, optimizer, num_epochs, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
+
+def trainer(train_set, test_set, trainloader, testloader, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
-    cos_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
+    cos_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)
     history = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
-    print('------ Training started on %s with total number of %d epochs ------'.format(device, num_epochs))
-    for epoch in range(num_epochs):
+    print('------ Training started on {} with total number of {} epochs ------'.format(device, args.num_epochs))
+    for epoch in range(args.num_epochs):
         train_acc = 0
         train_loss = 0
         for (imgs, labels), idx in trainloader:
@@ -29,14 +32,17 @@ def trainer(trainloader, testloader, model, optimizer, num_epochs, criterion, de
             if args.learned_metric == "iteration":  # if we are using iteration learned metric
                 model.eval()
                 for image_id in learning_history_train_dict.keys():
-                    (curr_img, curr_target), curr_index = trainloader[image_id]
-                    curr_img, curr_target = curr_img.to(device), curr_target.to(device)
-                    learning_history_train_dict[image_id].append(curr_target == model(curr_img).argmax(1).item())
+                    (curr_img, curr_target), curr_index = train_set[image_id]
+                    curr_img = curr_img.to(device)
+                    pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
+                    learning_history_train_dict[image_id].append(curr_target == pred)
                 for image_id in learning_history_test_dict.keys():
-                    (curr_img, curr_target), curr_index = testloader[image_id]
-                    curr_img, curr_target = curr_img.to(device), curr_target.to(device)
-                    learning_history_test_dict[image_id].append(curr_target == model(curr_img).argmax(1).item())
+                    (curr_img, curr_target), curr_index = test_set[image_id]
+                    curr_img = curr_img.to(device)
+                    pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
+                    learning_history_test_dict[image_id].append(curr_target == pred)
                 model.train()
+
         cos_scheduler.step()
         train_acc /= len(trainloader.dataset)
         train_loss /= len(trainloader.dataset)
@@ -47,13 +53,15 @@ def trainer(trainloader, testloader, model, optimizer, num_epochs, criterion, de
         if args.learned_metric == "epoch":  # if we are using epoch learned metric
             model.eval()
             for image_id in learning_history_train_dict.keys():
-                (curr_img, curr_target), curr_index = trainloader[image_id]
-                curr_img, curr_target = curr_img.to(device), curr_target.to(device)
-                learning_history_train_dict[image_id].append(curr_target == model(curr_img).argmax(1).item())
+                (curr_img, curr_target), curr_index = train_set[image_id]
+                curr_img = curr_img.to(device)
+                pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
+                learning_history_train_dict[image_id].append(curr_target == pred)
             for image_id in learning_history_test_dict.keys():
-                (curr_img, curr_target), curr_index = testloader[image_id]
-                curr_img, curr_target = curr_img.to(device), curr_target.to(device)
-                learning_history_test_dict[image_id].append(curr_target == model(curr_img).argmax(1).item())
+                (curr_img, curr_target), curr_index = test_set[image_id]
+                curr_img = curr_img.to(device)
+                pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
+                learning_history_test_dict[image_id].append(curr_target == pred)
             model.train()
         if curr_iteration > args.iterations:
             break
@@ -89,10 +97,10 @@ def determineLearnedMetric(learning_history_dict):
 
 def main():
     arg = config.parse_arguments()
-    trainloader, testloader, val_split, single_train_loader, single_test_loader = dataset.get_dataset(arg)
-
+    train_set, test_set, trainloader, testloader, val_split, single_train_loader, single_test_loader = dataset.get_dataset(arg)
     if arg.dataset == "cifar10":
-        model = models.VGGPD(10)
+        ecd = vgg16().features
+        model = models.VGGPD(ecd, 10)
     else:
         raise NotImplementedError
 
@@ -122,20 +130,27 @@ def main():
     for _, idx in single_test_loader:
         learning_history_test_dict[idx] = list()
 
-    trainer(trainloader, testloader, model, optimizer, arg.epochs, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
+
+    print("----- start training -----")
+    trainer(train_set, test_set, trainloader, testloader, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
     learned_metric_train = determineLearnedMetric(learning_history_train_dict)
     learned_metric_test = determineLearnedMetric(learning_history_test_dict)
 
+    print("----- start training -----")
+
     """Saving the learned metric dictionary"""
     if arg.learned_metric == "iteration":
-        with open(os.path.join(os.getcwd(), "learned_metric_train_iteration.json"), "w") as f:
+        with open(os.path.join(arg.result_dir, "learned_metric_train_iteration.json"), "w") as f:
             json.dump(learned_metric_train, f)
-        with open(os.path.join(os.getcwd(), "learned_metric_test_iteration.json"), "w") as f:
+        with open(os.path.join(arg.result_dir, "learned_metric_test_iteration.json"), "w") as f:
             json.dump(learned_metric_test, f)
     elif arg.learned_metric == "epoch":
-        with open(os.path.join(os.getcwd(), "learned_metric_train_epoch.json"), "w") as f:
+        with open(os.path.join(arg.result_dir, "learned_metric_train_epoch.json"), "w") as f:
             json.dump(learned_metric_train, f)
-        with open(os.path.join(os.getcwd(), "learned_metric_test_epoch.json"), "w") as f:
+        with open(os.path.join(arg.result_dir, "learned_metric_test_epoch.json"), "w") as f:
             json.dump(learned_metric_test, f)
     else:
         raise NotImplementedError
+
+if __name__ == '__main__':
+    main()
