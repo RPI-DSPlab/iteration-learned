@@ -1,3 +1,16 @@
 
 *.xml
 *.iml
+*.pyc
+*.meta
+cifar-10-batches-py/data_batch_1
+cifar-10-batches-py/data_batch_2
+cifar-10-batches-py/data_batch_3
+cifar-10-batches-py/data_batch_4
+cifar-10-batches-py/data_batch_5
+*.html
+cifar-10-batches-py/test_batch
+*.gz
+/cl_results_single/
+/cifar-10-batches-py/
+*.pkl

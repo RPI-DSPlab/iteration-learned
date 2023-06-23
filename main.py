@@ -1,13 +1,12 @@
 import torch
 from torchvision.models import vgg16
-
 import models
 import os
 import numpy as np
 import json
-import argparse
 import config
 import dataset
+import time
 
 
 def trainer(train_set, test_set, trainloader, testloader, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
@@ -16,6 +15,8 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
     history = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
     print('------ Training started on {} with total number of {} epochs ------'.format(device, args.num_epochs))
     for epoch in range(args.num_epochs):
+        # time each epoch
+        start_time_train = time.time()
         train_acc = 0
         train_loss = 0
         for (imgs, labels), idx in trainloader:
@@ -48,7 +49,8 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
         train_loss /= len(trainloader.dataset)
         history["train_loss"].append(train_loss)
         history["train_acc"].append(train_acc)
-        print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.6f}'.format(epoch, train_loss, train_acc))
+
+        end_time_train = time.time()
 
         if args.learned_metric == "epoch":  # if we are using epoch learned metric
             model.eval()
@@ -57,6 +59,7 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
                 curr_img = curr_img.to(device)
                 pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
                 learning_history_train_dict[image_id].append(curr_target == pred)
+
             for image_id in learning_history_test_dict.keys():
                 (curr_img, curr_target), curr_index = test_set[image_id]
                 curr_img = curr_img.to(device)
@@ -65,6 +68,11 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
             model.train()
         if curr_iteration > args.iterations:
             break
+        end_time_after_inference = time.time()
+
+        print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
+              '{:.6f}'.format(epoch, train_loss, train_acc, end_time_train - start_time_train,
+                              end_time_after_inference - end_time_train))
 
 def determineLearnedMetric(learning_history_dict):
     """
@@ -79,13 +87,12 @@ def determineLearnedMetric(learning_history_dict):
         learned_bool = False
         curr_itr = 0
         for j in learning_history_dict[i]:
-            if j == True:
+            if j == True:  # if the model has learned this datapoint
                 if learned_bool == False:
-                    learned_bool = True
-                    learned_itr = 0
-            else:
-                if learned_bool == True:
-                    learned_bool = False
+                    learned_itr = curr_itr
+                learned_bool = True
+            else:  # if the model has not learned this datapoint or has forgotten it
+                learned_bool = False
             curr_itr += 1
 
         if learned_bool == True:
@@ -125,10 +132,10 @@ def main():
     iteration learned or epoch learned metric"""
     learning_history_train_dict = {}
     for _, idx in single_train_loader:
-        learning_history_train_dict[idx] = list()
+        learning_history_train_dict[idx.item()] = list()
     learning_history_test_dict = {}
     for _, idx in single_test_loader:
-        learning_history_test_dict[idx] = list()
+        learning_history_test_dict[idx.item()] = list()
 
 
     print("----- start training -----")
@@ -139,18 +146,33 @@ def main():
     print("----- start training -----")
 
     """Saving the learned metric dictionary"""
-    if arg.learned_metric == "iteration":
-        with open(os.path.join(arg.result_dir, "learned_metric_train_iteration.json"), "w") as f:
-            json.dump(learned_metric_train, f)
-        with open(os.path.join(arg.result_dir, "learned_metric_test_iteration.json"), "w") as f:
-            json.dump(learned_metric_test, f)
-    elif arg.learned_metric == "epoch":
-        with open(os.path.join(arg.result_dir, "learned_metric_train_epoch.json"), "w") as f:
-            json.dump(learned_metric_train, f)
-        with open(os.path.join(arg.result_dir, "learned_metric_test_epoch.json"), "w") as f:
-            json.dump(learned_metric_test, f)
-    else:
-        raise NotImplementedError
+    if arg.save_result:
+        if not os.path.exists(arg.result_dir):
+            os.makedirs(arg.result_dir)
+
+        # remove previous results
+        files = os.listdir(arg.result_dir)
+        for file in files:
+            if file.endswith('.json'):
+                file_path = os.path.join(arg.result_dir, file)
+                os.remove(file_path)
+
+        if arg.learned_metric == "iteration":
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_iteration.json".format(arg.dataset
+                                   ,arg.model)), "w") as f:
+                json.dump(learned_metric_train, f)
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_iteration.json".format(arg.dataset
+                                   ,arg.model)), "w") as f:
+                json.dump(learned_metric_test, f)
+        elif arg.learned_metric == "epoch":
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch.json".format(arg.dataset
+                                   ,arg.model)), "w") as f:
+                json.dump(learned_metric_train, f)
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_epoch.json".format(arg.dataset
+                                   ,arg.model)), "w") as f:
+                json.dump(learned_metric_test, f)
+        else:
+            raise NotImplementedError
 
 if __name__ == '__main__':
     main()

@@ -9,6 +9,7 @@ def parse_arguments():
     parser.add_argument('--train_ratio', type=float, default=0.5, help='Ratio for training data')
 
     # Model
+    parser.add_argument('--model', type=str, default='vgg16', help='Model name')
     parser.add_argument('--input_dim', type=int, default=100, help='Input dimension')
     parser.add_argument('--hidden_dim', type=int, default=64, help='Hidden dimension')
     parser.add_argument('--output_dim', type=int, default=10, help='Output dimension')
@@ -27,5 +28,6 @@ def parse_arguments():
                         help='Seed values')
     parser.add_argument('--log_interval', type=int, default=10, help='Log interval')
     parser.add_argument('--result_dir', type=str, default='results', help='Result directory')
+    parser.add_argument('--save_result', type=bool, default=True, help='Save results')
 
     return parser.parse_args()
