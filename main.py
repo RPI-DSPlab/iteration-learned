@@ -9,7 +9,7 @@ import dataset
 import time
 
 
-def trainer(train_set, test_set, trainloader, testloader, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
+def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
     cos_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)
     history = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
@@ -32,16 +32,18 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
             curr_iteration += 1
             if args.learned_metric == "iteration":  # if we are using iteration learned metric
                 model.eval()
-                for image_id in learning_history_train_dict.keys():
-                    (curr_img, curr_target), curr_index = train_set[image_id]
-                    curr_img = curr_img.to(device)
-                    pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
-                    learning_history_train_dict[image_id].append(curr_target == pred)
-                for image_id in learning_history_test_dict.keys():
-                    (curr_img, curr_target), curr_index = test_set[image_id]
-                    curr_img = curr_img.to(device)
-                    pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
-                    learning_history_test_dict[image_id].append(curr_target == pred)
+                for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
+                    imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                    outputs_inf = model(imgs_inf)
+                    _, predicted_inf = torch.max(outputs_inf.data, 1)
+                    for i in range(len(idx_inf)):
+                        learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                for (imgs_inf, labels_inf), idx_inf in testloader_inf:
+                    imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                    outputs_inf = model(imgs_inf)
+                    _, predicted_inf = torch.max(outputs_inf.data, 1)
+                    for i in range(len(idx_inf)):
+                        learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
                 model.train()
 
         cos_scheduler.step()
@@ -54,17 +56,18 @@ def trainer(train_set, test_set, trainloader, testloader, model, optimizer, crit
 
         if args.learned_metric == "epoch":  # if we are using epoch learned metric
             model.eval()
-            for image_id in learning_history_train_dict.keys():
-                (curr_img, curr_target), curr_index = train_set[image_id]
-                curr_img = curr_img.to(device)
-                pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
-                learning_history_train_dict[image_id].append(curr_target == pred)
-
-            for image_id in learning_history_test_dict.keys():
-                (curr_img, curr_target), curr_index = test_set[image_id]
-                curr_img = curr_img.to(device)
-                pred = model(torch.unsqueeze(curr_img, 0)).argmax(1).item()
-                learning_history_test_dict[image_id].append(curr_target == pred)
+            for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
+                imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                outputs_inf = model(imgs_inf)
+                _, predicted_inf = torch.max(outputs_inf.data, 1)
+                for i in range(len(idx_inf)):
+                    learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+            for (imgs_inf, labels_inf), idx_inf in testloader_inf:
+                imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                outputs_inf = model(imgs_inf)
+                _, predicted_inf = torch.max(outputs_inf.data, 1)
+                for i in range(len(idx_inf)):
+                    learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
             model.train()
         if curr_iteration > args.iterations:
             break
@@ -104,7 +107,10 @@ def determineLearnedMetric(learning_history_dict):
 
 def main():
     arg = config.parse_arguments()
-    train_set, test_set, trainloader, testloader, val_split, single_train_loader, single_test_loader = dataset.get_dataset(arg)
+    # loading the dataset, note that trainloader_inf and testloader_inf are for inference for the learned metric
+    train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, val_split = dataset.get_dataset(arg)
+
+
     if arg.dataset == "cifar10":
         ecd = vgg16().features
         model = models.VGGPD(ecd, 10)
@@ -131,15 +137,17 @@ def main():
     a data point is either correctly classified or misclassified. This directory will be further used to determine the 
     iteration learned or epoch learned metric"""
     learning_history_train_dict = {}
-    for _, idx in single_train_loader:
-        learning_history_train_dict[idx.item()] = list()
+    for _, idx in trainloader_inf:
+        for i in idx:
+            learning_history_train_dict[i.item()] = list()
     learning_history_test_dict = {}
-    for _, idx in single_test_loader:
-        learning_history_test_dict[idx.item()] = list()
+    for _, idx in testloader_inf:
+        for i in idx:
+            learning_history_test_dict[i.item()] = list()
 
 
     print("----- start training -----")
-    trainer(train_set, test_set, trainloader, testloader, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
+    trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
     learned_metric_train = determineLearnedMetric(learning_history_train_dict)
     learned_metric_test = determineLearnedMetric(learning_history_test_dict)
 
