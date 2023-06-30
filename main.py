@@ -72,8 +72,8 @@ def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testl
         if curr_iteration > args.iterations:
             break
         end_time_after_inference = time.time()
-
-        print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
+        if epoch % 10 == 0:
+            print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
               '{:.6f}'.format(epoch, train_loss, train_acc, end_time_train - start_time_train,
                               end_time_after_inference - end_time_train))
 
@@ -151,33 +151,26 @@ def main(arg, seed=1234):
     learned_metric_train = determineLearnedMetric(learning_history_train_dict)
     learned_metric_test = determineLearnedMetric(learning_history_test_dict)
 
-    print("----- start training -----")
+    print("----- end training -----")
 
     """Saving the learned metric dictionary"""
     if arg.save_result:
         if not os.path.exists(arg.result_dir):
             os.makedirs(arg.result_dir)
 
-        # remove previous results
-        files = os.listdir(arg.result_dir)
-        for file in files:
-            if file.endswith('.json'):
-                file_path = os.path.join(arg.result_dir, file)
-                os.remove(file_path)
-
         if arg.learned_metric == "iteration":
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_iteration_seed{}_train.json".format(arg.dataset
                                    ,arg.model, seed)), "w") as f:
                 json.dump(learned_metric_train, f)
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_iteration_seed{}_test.json".format(arg.dataset
-                                   ,arg.model), seed), "w") as f:
+                                   ,arg.model, seed)), "w") as f:
                 json.dump(learned_metric_test, f)
         elif arg.learned_metric == "epoch":
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
-                                   ,arg.model), seed), "w") as f:
+                                   ,arg.model, seed)), "w") as f:
                 json.dump(learned_metric_train, f)
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
-                                   ,arg.model), seed), "w") as f:
+                                   ,arg.model, seed)), "w") as f:
                 json.dump(learned_metric_test, f)
         else:
             raise NotImplementedError
@@ -186,9 +179,10 @@ if __name__ == '__main__':
     arg = config.parse_arguments()
     if not arg.skip_training:
         for seed in arg.seeds:
+            print("-------- starting seed {} --------".format(seed))
             main(arg, seed)
-    _, train_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
-    _, test_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
+    train_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
+    test_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
 
     if not os.path.exists(arg.result_dir + "/avg"):
         os.makedirs(arg.result_dir + "/avg")
@@ -198,14 +192,14 @@ if __name__ == '__main__':
                                ,arg.model, seed)), "w") as f:
             json.dump(train_avg_score, f)
         with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_seed{}_test.json".format(arg.dataset
-                               ,arg.model), seed), "w") as f:
+                               ,arg.model, seed)), "w") as f:
             json.dump(test_avg_score, f)
     elif arg.learned_metric == "epoch":
         with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
-                               ,arg.model), seed), "w") as f:
+                               ,arg.model, seed)), "w") as f:
             json.dump(train_avg_score, f)
         with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
-                               ,arg.model), seed), "w") as f:
+                               ,arg.model, seed)), "w") as f:
             json.dump(test_avg_score, f)
     else:
         raise NotImplementedError

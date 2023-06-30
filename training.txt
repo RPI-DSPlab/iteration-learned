@@ -1,86 +1,68 @@
+-------- starting seed 9203 --------
 Files already downloaded and verified
 Files already downloaded and verified
 Using GPU
 ----- start training -----
------- Training started on cuda with total number of 80 epochs ------
-Epoch: 0 	Training Loss: 0.002300 	Training Accuracy: 0.11, training time: 1.60, inference time: 2.563858
-Epoch: 1 	Training Loss: 0.002294 	Training Accuracy: 0.11, training time: 0.63, inference time: 2.540295
-Epoch: 2 	Training Loss: 0.002281 	Training Accuracy: 0.11, training time: 0.59, inference time: 2.431238
-Epoch: 3 	Training Loss: 0.002243 	Training Accuracy: 0.15, training time: 0.60, inference time: 2.469437
-Epoch: 4 	Training Loss: 0.002368 	Training Accuracy: 0.16, training time: 0.60, inference time: 2.420167
-Epoch: 5 	Training Loss: 0.002304 	Training Accuracy: 0.10, training time: 0.64, inference time: 2.573797
-Epoch: 6 	Training Loss: 0.002302 	Training Accuracy: 0.10, training time: 0.59, inference time: 2.420344
-Epoch: 7 	Training Loss: 0.002300 	Training Accuracy: 0.12, training time: 0.59, inference time: 2.706100
-Epoch: 8 	Training Loss: 0.002297 	Training Accuracy: 0.13, training time: 0.60, inference time: 2.442867
-Epoch: 9 	Training Loss: 0.002293 	Training Accuracy: 0.11, training time: 0.68, inference time: 2.581957
-Epoch: 10 	Training Loss: 0.002288 	Training Accuracy: 0.11, training time: 0.62, inference time: 2.519361
-Epoch: 11 	Training Loss: 0.002280 	Training Accuracy: 0.11, training time: 0.59, inference time: 2.463533
-Epoch: 12 	Training Loss: 0.002265 	Training Accuracy: 0.15, training time: 0.60, inference time: 2.464509
-Epoch: 13 	Training Loss: 0.002246 	Training Accuracy: 0.16, training time: 0.60, inference time: 2.497658
-Epoch: 14 	Training Loss: 0.002214 	Training Accuracy: 0.17, training time: 0.60, inference time: 2.462057
-Epoch: 15 	Training Loss: 0.002385 	Training Accuracy: 0.10, training time: 0.61, inference time: 2.456183
-Epoch: 16 	Training Loss: 0.002317 	Training Accuracy: 0.10, training time: 0.60, inference time: 2.472587
-Epoch: 17 	Training Loss: 0.002310 	Training Accuracy: 0.11, training time: 0.55, inference time: 2.355330
-Epoch: 18 	Training Loss: 0.002300 	Training Accuracy: 0.11, training time: 0.54, inference time: 2.330068
-Epoch: 19 	Training Loss: 0.002291 	Training Accuracy: 0.13, training time: 0.54, inference time: 2.325175
-Epoch: 20 	Training Loss: 0.002281 	Training Accuracy: 0.15, training time: 0.55, inference time: 2.312487
-Epoch: 21 	Training Loss: 0.002266 	Training Accuracy: 0.14, training time: 0.53, inference time: 2.325736
-Epoch: 22 	Training Loss: 0.002238 	Training Accuracy: 0.16, training time: 0.54, inference time: 2.316511
-Epoch: 23 	Training Loss: 0.002206 	Training Accuracy: 0.17, training time: 0.54, inference time: 2.312613
-Epoch: 24 	Training Loss: 0.002214 	Training Accuracy: 0.17, training time: 0.52, inference time: 2.301407
-Epoch: 25 	Training Loss: 0.002198 	Training Accuracy: 0.18, training time: 0.54, inference time: 2.296765
-Epoch: 26 	Training Loss: 0.002166 	Training Accuracy: 0.19, training time: 0.53, inference time: 2.315152
-Epoch: 27 	Training Loss: 0.002142 	Training Accuracy: 0.22, training time: 0.53, inference time: 2.316721
-Epoch: 28 	Training Loss: 0.002122 	Training Accuracy: 0.23, training time: 0.54, inference time: 2.308241
-Epoch: 29 	Training Loss: 0.002143 	Training Accuracy: 0.22, training time: 0.54, inference time: 2.318201
-Epoch: 30 	Training Loss: 0.002164 	Training Accuracy: 0.20, training time: 0.56, inference time: 2.459572
-Epoch: 31 	Training Loss: 0.002113 	Training Accuracy: 0.22, training time: 0.59, inference time: 2.332219
-Epoch: 32 	Training Loss: 0.002074 	Training Accuracy: 0.25, training time: 0.59, inference time: 2.414649
-Epoch: 33 	Training Loss: 0.002036 	Training Accuracy: 0.26, training time: 0.53, inference time: 2.438026
-Epoch: 34 	Training Loss: 0.002017 	Training Accuracy: 0.27, training time: 0.58, inference time: 2.337872
-Epoch: 35 	Training Loss: 0.002085 	Training Accuracy: 0.23, training time: 0.54, inference time: 2.388580
-Epoch: 36 	Training Loss: 0.002026 	Training Accuracy: 0.26, training time: 0.54, inference time: 2.407685
-Epoch: 37 	Training Loss: 0.002002 	Training Accuracy: 0.28, training time: 0.54, inference time: 2.423322
-Epoch: 38 	Training Loss: 0.001957 	Training Accuracy: 0.29, training time: 0.60, inference time: 2.385916
-Epoch: 39 	Training Loss: 0.001929 	Training Accuracy: 0.30, training time: 0.54, inference time: 2.448054
-Epoch: 40 	Training Loss: 0.001908 	Training Accuracy: 0.30, training time: 0.54, inference time: 2.518577
-Epoch: 41 	Training Loss: 0.001898 	Training Accuracy: 0.31, training time: 0.54, inference time: 2.352402
-Epoch: 42 	Training Loss: 0.002029 	Training Accuracy: 0.26, training time: 0.60, inference time: 2.352259
-Epoch: 43 	Training Loss: 0.001958 	Training Accuracy: 0.28, training time: 0.53, inference time: 2.484993
-Epoch: 44 	Training Loss: 0.001916 	Training Accuracy: 0.30, training time: 0.58, inference time: 2.546442
-Epoch: 45 	Training Loss: 0.001877 	Training Accuracy: 0.31, training time: 0.59, inference time: 2.586119
-Epoch: 46 	Training Loss: 0.001875 	Training Accuracy: 0.32, training time: 0.59, inference time: 2.606304
-Epoch: 47 	Training Loss: 0.001845 	Training Accuracy: 0.33, training time: 0.61, inference time: 2.750983
-Epoch: 48 	Training Loss: 0.001818 	Training Accuracy: 0.33, training time: 0.61, inference time: 2.777519
-Epoch: 49 	Training Loss: 0.001797 	Training Accuracy: 0.33, training time: 0.61, inference time: 2.709183
-Epoch: 50 	Training Loss: 0.001780 	Training Accuracy: 0.35, training time: 0.60, inference time: 2.771233
-Epoch: 51 	Training Loss: 0.001761 	Training Accuracy: 0.35, training time: 0.61, inference time: 2.765297
-Epoch: 52 	Training Loss: 0.001747 	Training Accuracy: 0.36, training time: 0.61, inference time: 2.667559
-Epoch: 53 	Training Loss: 0.001753 	Training Accuracy: 0.35, training time: 0.61, inference time: 2.581077
-Epoch: 54 	Training Loss: 0.001739 	Training Accuracy: 0.36, training time: 0.61, inference time: 2.635845
-Epoch: 55 	Training Loss: 0.001724 	Training Accuracy: 0.37, training time: 0.62, inference time: 2.761409
-Epoch: 56 	Training Loss: 0.001706 	Training Accuracy: 0.38, training time: 0.60, inference time: 2.652459
-Epoch: 57 	Training Loss: 0.001700 	Training Accuracy: 0.37, training time: 0.60, inference time: 2.649027
-Epoch: 58 	Training Loss: 0.001687 	Training Accuracy: 0.38, training time: 0.62, inference time: 2.686317
-Epoch: 59 	Training Loss: 0.001671 	Training Accuracy: 0.39, training time: 0.61, inference time: 2.698500
-Epoch: 60 	Training Loss: 0.001681 	Training Accuracy: 0.38, training time: 0.61, inference time: 2.641846
-Epoch: 61 	Training Loss: 0.001654 	Training Accuracy: 0.40, training time: 0.61, inference time: 2.727200
-Epoch: 62 	Training Loss: 0.001636 	Training Accuracy: 0.40, training time: 0.60, inference time: 2.687191
-Epoch: 63 	Training Loss: 0.001637 	Training Accuracy: 0.40, training time: 0.62, inference time: 2.663136
-Epoch: 64 	Training Loss: 0.001634 	Training Accuracy: 0.40, training time: 0.61, inference time: 2.718400
-Epoch: 65 	Training Loss: 0.001623 	Training Accuracy: 0.41, training time: 0.61, inference time: 2.655595
-Epoch: 66 	Training Loss: 0.001621 	Training Accuracy: 0.40, training time: 0.61, inference time: 2.673703
-Epoch: 67 	Training Loss: 0.001611 	Training Accuracy: 0.41, training time: 0.66, inference time: 2.626123
-Epoch: 68 	Training Loss: 0.001611 	Training Accuracy: 0.41, training time: 0.67, inference time: 2.728604
-Epoch: 69 	Training Loss: 0.001611 	Training Accuracy: 0.41, training time: 0.70, inference time: 2.808595
-Epoch: 70 	Training Loss: 0.001608 	Training Accuracy: 0.41, training time: 0.69, inference time: 2.865267
-Epoch: 71 	Training Loss: 0.001605 	Training Accuracy: 0.41, training time: 0.64, inference time: 2.767400
-Epoch: 72 	Training Loss: 0.001589 	Training Accuracy: 0.42, training time: 0.63, inference time: 2.682674
-Epoch: 73 	Training Loss: 0.001598 	Training Accuracy: 0.41, training time: 0.62, inference time: 2.672913
-Epoch: 74 	Training Loss: 0.001596 	Training Accuracy: 0.41, training time: 0.60, inference time: 2.787605
-Epoch: 75 	Training Loss: 0.001596 	Training Accuracy: 0.42, training time: 0.61, inference time: 2.715435
-Epoch: 76 	Training Loss: 0.001592 	Training Accuracy: 0.41, training time: 0.61, inference time: 2.766237
-Epoch: 77 	Training Loss: 0.001592 	Training Accuracy: 0.43, training time: 0.67, inference time: 2.740670
-Epoch: 78 	Training Loss: 0.001587 	Training Accuracy: 0.42, training time: 0.67, inference time: 2.717466
-Epoch: 79 	Training Loss: 0.001596 	Training Accuracy: 0.41, training time: 0.68, inference time: 2.668768
+------ Training started on cuda with total number of 100 epochs ------
+Epoch: 0 	Training Loss: 0.002301 	Training Accuracy: 0.11, training time: 1.50, inference time: 2.442005
+Epoch: 10 	Training Loss: 0.002239 	Training Accuracy: 0.16, training time: 0.53, inference time: 2.325068
+Epoch: 20 	Training Loss: 0.002044 	Training Accuracy: 0.24, training time: 0.54, inference time: 2.309475
+Epoch: 30 	Training Loss: 0.002092 	Training Accuracy: 0.21, training time: 0.53, inference time: 2.305081
+Epoch: 40 	Training Loss: 0.001892 	Training Accuracy: 0.29, training time: 0.54, inference time: 2.296532
+Epoch: 50 	Training Loss: 0.001734 	Training Accuracy: 0.35, training time: 0.54, inference time: 2.318436
+Epoch: 60 	Training Loss: 0.001609 	Training Accuracy: 0.40, training time: 0.54, inference time: 2.318772
+Epoch: 70 	Training Loss: 0.001509 	Training Accuracy: 0.44, training time: 0.54, inference time: 2.347763
+Epoch: 80 	Training Loss: 0.001432 	Training Accuracy: 0.46, training time: 0.54, inference time: 2.328605
+Epoch: 90 	Training Loss: 0.001405 	Training Accuracy: 0.47, training time: 0.55, inference time: 2.343874
+----- end training -----
+-------- starting seed 9304 --------
+Files already downloaded and verified
+Files already downloaded and verified
+Using GPU
 ----- start training -----
+------ Training started on cuda with total number of 100 epochs ------
+Epoch: 0 	Training Loss: 0.002302 	Training Accuracy: 0.10, training time: 0.56, inference time: 2.307645
+Epoch: 10 	Training Loss: 0.002225 	Training Accuracy: 0.17, training time: 0.54, inference time: 2.337937
+Epoch: 20 	Training Loss: 0.002275 	Training Accuracy: 0.14, training time: 0.55, inference time: 2.340535
+Epoch: 30 	Training Loss: 0.002045 	Training Accuracy: 0.25, training time: 0.54, inference time: 2.381092
+Epoch: 40 	Training Loss: 0.001931 	Training Accuracy: 0.29, training time: 0.55, inference time: 2.389729
+Epoch: 50 	Training Loss: 0.001797 	Training Accuracy: 0.32, training time: 0.55, inference time: 2.344069
+Epoch: 60 	Training Loss: 0.001704 	Training Accuracy: 0.36, training time: 0.55, inference time: 2.418858
+Epoch: 70 	Training Loss: 0.001605 	Training Accuracy: 0.40, training time: 0.55, inference time: 2.449778
+Epoch: 80 	Training Loss: 0.001538 	Training Accuracy: 0.43, training time: 0.60, inference time: 2.425198
+Epoch: 90 	Training Loss: 0.001497 	Training Accuracy: 0.44, training time: 0.55, inference time: 2.431681
+----- end training -----
+-------- starting seed 3456 --------
+Files already downloaded and verified
+Files already downloaded and verified
+Using GPU
+----- start training -----
+------ Training started on cuda with total number of 100 epochs ------
+Epoch: 0 	Training Loss: 0.002302 	Training Accuracy: 0.11, training time: 0.56, inference time: 2.335119
+Epoch: 10 	Training Loss: 0.002245 	Training Accuracy: 0.16, training time: 0.54, inference time: 2.341429
+Epoch: 20 	Training Loss: 0.002050 	Training Accuracy: 0.26, training time: 0.55, inference time: 2.329710
+Epoch: 30 	Training Loss: 0.002001 	Training Accuracy: 0.26, training time: 0.55, inference time: 2.331723
+Epoch: 40 	Training Loss: 0.001842 	Training Accuracy: 0.33, training time: 0.56, inference time: 2.330781
+Epoch: 50 	Training Loss: 0.001881 	Training Accuracy: 0.32, training time: 0.56, inference time: 2.339782
+Epoch: 60 	Training Loss: 0.001796 	Training Accuracy: 0.34, training time: 0.54, inference time: 2.331944
+Epoch: 70 	Training Loss: 0.001696 	Training Accuracy: 0.37, training time: 0.55, inference time: 2.339763
+Epoch: 80 	Training Loss: 0.001634 	Training Accuracy: 0.40, training time: 0.55, inference time: 2.356674
+Epoch: 90 	Training Loss: 0.001589 	Training Accuracy: 0.41, training time: 0.55, inference time: 2.369641
+----- end training -----
+-------- starting seed 5210 --------
+Files already downloaded and verified
+Files already downloaded and verified
+Using GPU
+----- start training -----
+------ Training started on cuda with total number of 100 epochs ------
+Epoch: 0 	Training Loss: 0.002301 	Training Accuracy: 0.10, training time: 0.56, inference time: 2.332752
+Epoch: 10 	Training Loss: 0.002224 	Training Accuracy: 0.17, training time: 0.55, inference time: 2.323925
+Epoch: 20 	Training Loss: 0.002038 	Training Accuracy: 0.24, training time: 0.54, inference time: 2.342709
+Epoch: 30 	Training Loss: 0.001948 	Training Accuracy: 0.27, training time: 0.55, inference time: 2.341353
+Epoch: 40 	Training Loss: 0.001826 	Training Accuracy: 0.31, training time: 0.55, inference time: 2.330198
+Epoch: 50 	Training Loss: 0.001719 	Training Accuracy: 0.36, training time: 0.55, inference time: 2.378239
+Epoch: 60 	Training Loss: 0.001619 	Training Accuracy: 0.38, training time: 0.55, inference time: 2.344932
+Epoch: 70 	Training Loss: 0.001490 	Training Accuracy: 0.44, training time: 0.54, inference time: 2.371133
+Epoch: 80 	Training Loss: 0.001411 	Training Accuracy: 0.47, training time: 0.54, inference time: 2.321905
+Epoch: 90 	Training Loss: 0.001364 	Training Accuracy: 0.49, training time: 0.54, inference time: 2.352646
+----- end training -----
