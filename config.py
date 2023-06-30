@@ -24,7 +24,7 @@ def parse_arguments():
     parser.add_argument('--learned_metric', type=str, default='epoch', help='Iteration Learned or Epoch Learned')
 
     # Other configurations
-    parser.add_argument('--seeds', nargs='+', type=int, default=[9203, 9304, 9837, 9612, 3456, 5210],
+    parser.add_argument('--seeds', nargs='+', type=int, default=[9203, 9304, 3456, 5210],
                         help='Seed values')
     parser.add_argument('--log_interval', type=int, default=10, help='Log interval')
     parser.add_argument('--result_dir', type=str, default='results', help='Result directory')
