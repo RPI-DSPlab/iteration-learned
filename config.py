@@ -17,7 +17,7 @@ def parse_arguments():
     # Training
     parser.add_argument('--learning_rate', type=float, default=0.04, help='Learning rate')
     parser.add_argument('--iterations', type=int, default=15000, help='Number of iterations')
-    parser.add_argument('--num_epochs', type=int, default=80, help='Number of epochs')
+    parser.add_argument('--num_epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--num_samples', type=int, default=10000, help='Number of samples')
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes')
     parser.add_argument('--crit', type=str, default='cross_entropy', help='Loss criterion')
@@ -27,7 +27,8 @@ def parse_arguments():
     parser.add_argument('--seeds', nargs='+', type=int, default=[9203, 9304, 3456, 5210],
                         help='Seed values')
     parser.add_argument('--log_interval', type=int, default=10, help='Log interval')
-    parser.add_argument('--result_dir', type=str, default='results', help='Result directory')
+    parser.add_argument('--result_dir', type=str, default='il_results', help='Result directory')
     parser.add_argument('--save_result', type=bool, default=True, help='Save results')
+    parser.add_argument('--skip_training', type=bool, default=False, help='Skip calling the training function')
 
     return parser.parse_args()

@@ -7,7 +7,7 @@ import json
 import config
 import dataset
 import time
-
+import util
 
 def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
@@ -105,11 +105,11 @@ def determineLearnedMetric(learning_history_dict):
 
     return learned_metric_dict
 
-def main():
-    arg = config.parse_arguments()
+def main(arg, seed=1234):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
     # loading the dataset, note that trainloader_inf and testloader_inf are for inference for the learned metric
     train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, val_split = dataset.get_dataset(arg)
-
 
     if arg.dataset == "cifar10":
         ecd = vgg16().features
@@ -166,21 +166,46 @@ def main():
                 os.remove(file_path)
 
         if arg.learned_metric == "iteration":
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_iteration.json".format(arg.dataset
-                                   ,arg.model)), "w") as f:
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_iteration_seed{}_train.json".format(arg.dataset
+                                   ,arg.model, seed)), "w") as f:
                 json.dump(learned_metric_train, f)
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_iteration.json".format(arg.dataset
-                                   ,arg.model)), "w") as f:
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_iteration_seed{}_test.json".format(arg.dataset
+                                   ,arg.model), seed), "w") as f:
                 json.dump(learned_metric_test, f)
         elif arg.learned_metric == "epoch":
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch.json".format(arg.dataset
-                                   ,arg.model)), "w") as f:
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
+                                   ,arg.model), seed), "w") as f:
                 json.dump(learned_metric_train, f)
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_epoch.json".format(arg.dataset
-                                   ,arg.model)), "w") as f:
+            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
+                                   ,arg.model), seed), "w") as f:
                 json.dump(learned_metric_test, f)
         else:
             raise NotImplementedError
 
 if __name__ == '__main__':
-    main()
+    arg = config.parse_arguments()
+    if not arg.skip_training:
+        for seed in arg.seeds:
+            main(arg, seed)
+    _, train_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
+    _, test_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
+
+    if not os.path.exists(arg.result_dir + "/avg"):
+        os.makedirs(arg.result_dir + "/avg")
+
+    if arg.learned_metric == "iteration":
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_seed{}_train.json".format(arg.dataset
+                               ,arg.model, seed)), "w") as f:
+            json.dump(train_avg_score, f)
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_seed{}_test.json".format(arg.dataset
+                               ,arg.model), seed), "w") as f:
+            json.dump(test_avg_score, f)
+    elif arg.learned_metric == "epoch":
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
+                               ,arg.model), seed), "w") as f:
+            json.dump(train_avg_score, f)
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
+                               ,arg.model), seed), "w") as f:
+            json.dump(test_avg_score, f)
+    else:
+        raise NotImplementedError
