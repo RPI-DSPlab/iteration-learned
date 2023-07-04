@@ -17,7 +17,7 @@ def parse_arguments():
     # Training
     parser.add_argument('--learning_rate', type=float, default=0.04, help='Learning rate')
     parser.add_argument('--iterations', type=int, default=15000, help='Number of iterations')
-    parser.add_argument('--num_epochs', type=int, default=100, help='Number of epochs')
+    parser.add_argument('--num_epochs', type=int, default=250, help='Number of epochs')
     parser.add_argument('--num_samples', type=int, default=10000, help='Number of samples')
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes')
     parser.add_argument('--crit', type=str, default='cross_entropy', help='Loss criterion')

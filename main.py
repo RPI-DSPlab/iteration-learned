@@ -72,7 +72,7 @@ def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testl
         if curr_iteration > args.iterations:
             break
         end_time_after_inference = time.time()
-        if epoch % 10 == 0:
+        if epoch % 20 == 0:
             print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
               '{:.6f}'.format(epoch, train_loss, train_acc, end_time_train - start_time_train,
                               end_time_after_inference - end_time_train))
