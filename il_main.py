@@ -4,10 +4,10 @@ import models
 import os
 import numpy as np
 import json
-import config
+import il_config
 import dataset
 import time
-import util
+import il_util
 
 def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
@@ -176,30 +176,30 @@ def main(arg, seed=1234):
             raise NotImplementedError
 
 if __name__ == '__main__':
-    arg = config.parse_arguments()
+    arg = il_config.parse_arguments()
     if not arg.skip_training:
         for seed in arg.seeds:
             print("-------- starting seed {} --------".format(seed))
             main(arg, seed)
-    train_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
-    test_avg_score = util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
+    train_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
+    test_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
 
     if not os.path.exists(arg.result_dir + "/avg"):
         os.makedirs(arg.result_dir + "/avg")
 
     if arg.learned_metric == "iteration":
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_seed{}_train.json".format(arg.dataset
-                               ,arg.model, seed)), "w") as f:
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_train_avg.json".format(arg.dataset
+                               ,arg.model)), "w") as f:
             json.dump(train_avg_score, f)
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_seed{}_test.json".format(arg.dataset
-                               ,arg.model, seed)), "w") as f:
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_test_avg.json".format(arg.dataset
+                               ,arg.model)), "w") as f:
             json.dump(test_avg_score, f)
     elif arg.learned_metric == "epoch":
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
-                               ,arg.model, seed)), "w") as f:
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_train_epoch_train_avg.json".format(arg.dataset
+                               ,arg.model)), "w") as f:
             json.dump(train_avg_score, f)
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
-                               ,arg.model, seed)), "w") as f:
+        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_test_avg.json".format(arg.dataset
+                               ,arg.model)), "w") as f:
             json.dump(test_avg_score, f)
     else:
         raise NotImplementedError

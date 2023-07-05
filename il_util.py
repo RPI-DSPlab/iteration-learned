@@ -12,7 +12,7 @@ def avg_result(dir, file_suf='.json'):
 
     pd_dict_list = []
     file_list = os.listdir(dir)
-    file_names = [file for file in file_list if file.endswith(".pkl")]
+    file_names = [file for file in file_list if file.endswith(file_suf)]
 
     for file_name in file_names:
         file_path = os.path.join(dir, file_name)
