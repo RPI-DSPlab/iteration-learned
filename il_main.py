@@ -9,7 +9,7 @@ import dataset
 import time
 import il_util
 
-def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
+def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
     cos_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)
     history = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
@@ -20,7 +20,7 @@ def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testl
         train_acc = 0
         train_loss = 0
         for (imgs, labels), idx in trainloader:
-            imgs, labels = imgs.to(device), labels.to(device)
+            imgs, labels = imgs.cuda(non_blocking=True), labels.cuda(non_blocking=True)
             optimizer.zero_grad()
             outputs = model(imgs)
             loss = criterion(outputs, labels)
@@ -33,13 +33,13 @@ def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testl
             if args.learned_metric == "iteration":  # if we are using iteration learned metric
                 model.eval()
                 for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
-                    imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                     outputs_inf = model(imgs_inf)
                     _, predicted_inf = torch.max(outputs_inf.data, 1)
                     for i in range(len(idx_inf)):
                         learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
                 for (imgs_inf, labels_inf), idx_inf in testloader_inf:
-                    imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                     outputs_inf = model(imgs_inf)
                     _, predicted_inf = torch.max(outputs_inf.data, 1)
                     for i in range(len(idx_inf)):
@@ -57,13 +57,13 @@ def trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testl
         if args.learned_metric == "epoch":  # if we are using epoch learned metric
             model.eval()
             for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
-                imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                 outputs_inf = model(imgs_inf)
                 _, predicted_inf = torch.max(outputs_inf.data, 1)
                 for i in range(len(idx_inf)):
                     learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
             for (imgs_inf, labels_inf), idx_inf in testloader_inf:
-                imgs_inf, labels_inf = imgs_inf.to(device), labels_inf.to(device)
+                imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                 outputs_inf = model(imgs_inf)
                 _, predicted_inf = torch.max(outputs_inf.data, 1)
                 for i in range(len(idx_inf)):
@@ -147,7 +147,7 @@ def main(arg, seed=1234):
 
 
     print("----- start training -----")
-    trainer(train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
+    trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
     learned_metric_train = determineLearnedMetric(learning_history_train_dict)
     learned_metric_test = determineLearnedMetric(learning_history_test_dict)
 
@@ -181,8 +181,8 @@ if __name__ == '__main__':
         for seed in arg.seeds:
             print("-------- starting seed {} --------".format(seed))
             main(arg, seed)
-    train_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json")
-    test_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json")
+    train_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_train.json", roundToInt=True)
+    test_avg_score = il_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_test.json", roundToInt=True)
 
     if not os.path.exists(arg.result_dir + "/avg"):
         os.makedirs(arg.result_dir + "/avg")
