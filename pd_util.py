@@ -2,6 +2,8 @@ import numpy as np
 import torch
 from torch import autocast
 import torch.nn.functional as F
+import json
+import os
 
 
 def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t, rm_top1=True, dist='l2'):
@@ -70,7 +72,6 @@ def _get_feature_bank_from_kth_layer(model, dataloader, k, args):
             the all label bank (ground truth label for each datapoint)
     """
     # NOTE: dataloader now has the return format of '(img, target), index'
-    print(k, 'layer feature bank gotten')
     with torch.no_grad():
         for (img, all_label), idx in dataloader:
             img = img.cuda(non_blocking=True)  # an image from the dataset
@@ -98,8 +99,9 @@ def get_knn_prds_k_layer(model, evaloader, floader, k, args, train_split=True):
     knn_labels_all = []
     knn_conf_gt_all = []  # This statistics can be noisy
     indices_all = []
+
     f_bank, all_labels = _get_feature_bank_from_kth_layer(model, floader,
-                                                          k)  # get the feature bank and all labels for the support set
+                                                          k, args)  # get the feature bank and all labels for the support set
     f_bank = f_bank.t().contiguous()
     with torch.no_grad():
         for j, ((imgs, labels), idx) in enumerate(evaloader):
@@ -143,3 +145,32 @@ def get_prediction_depth(knn_labels_all, max_prediction_depth):
     while knn_labels_all[pd] == knn_labels_all[0] and pd <= max_prediction_depth - 2:
         pd += 1
     return max_prediction_depth - pd
+
+def avg_result(dir, file_suf='.json', roundToInt=False):
+    """
+    This function is used to average the results of an datapoint hardness metric across different seeds.
+    :param dir: directory of the results
+    :param file_suf: suffix of the result files (default: .json)
+    :return: a dictionary of averaged results
+    """
+
+    pd_dict_list = []
+    file_list = os.listdir(dir)
+    file_names = [file for file in file_list if file.endswith(file_suf)]
+
+    for file_name in file_names:
+        file_path = os.path.join(dir, file_name)
+        with open(file_path, "rb") as f:
+            dict_load = json.load(f)
+            pd_dict_list.append(dict_load)
+    pd_avg_dict = {}
+    for pd_dict in pd_dict_list:
+        for i in pd_dict.keys():
+            pd_avg_dict[int(i)] = pd_avg_dict.get(int(i)) + pd_dict[i] if (int(i) in pd_avg_dict.keys()) else pd_dict[i]
+    for i in pd_avg_dict.keys():
+        if not roundToInt:
+            pd_avg_dict[i] = pd_avg_dict[i] / len(pd_dict_list)
+        else:
+            pd_avg_dict[i] = int(pd_avg_dict[i] / len(pd_dict_list))
+
+    return pd_avg_dict

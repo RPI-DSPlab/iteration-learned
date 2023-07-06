@@ -9,6 +9,7 @@ import pd_config
 import dataset
 import time
 import pd_util
+from tqdm import tqdm
 
 def trainer(trainloader, testloader, model, optimizer, criterion, device, args):
     curr_iteration = 0
@@ -37,7 +38,9 @@ def trainer(trainloader, testloader, model, optimizer, criterion, device, args):
         history["train_loss"].append(train_loss)
         history["train_acc"].append(train_acc)
 
+        end_time_train = time.time()
         with torch.no_grad():
+
             test_acc = 0
             test_loss = 0
             for (imgs, labels), idx in testloader:
@@ -52,14 +55,12 @@ def trainer(trainloader, testloader, model, optimizer, criterion, device, args):
             history["test_loss"].append(test_loss)
             history["test_acc"].append(test_acc)
 
-        end_time_train = time.time()
-
         if curr_iteration > args.iterations:
             break
         end_time_after_inference = time.time()
         if epoch % 20 == 0:
             print(
-                'Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f} \tTraining Accuracy: {:.2f} \t Test Accuracy: {:.2f}, training time: {:.2f}, inference time: '
+                'Epoch: {}, Training Loss: {:.6f}, Test Loss: {:.6f}, Training Accuracy: {:.2f}, Test Accuracy: {:.2f}, training time: {:.2f}, inference time: '
                 '{:.6f}'.format(epoch, train_loss, test_loss, train_acc, test_acc, end_time_train - start_time_train,
                                 end_time_after_inference - end_time_train))
     return model, history
@@ -95,69 +96,70 @@ def main(arg, seed=1234):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=arg.learning_rate, momentum=0.9, weight_decay=5e-4)
 
-    if not arg.ressume:
+    if not arg.resume:
+        if not os.path.exists(arg.model_dir):
+            os.makedirs(arg.model_dir)
         print("----- start training -----")
         model, _ = trainer(trainloader, testloader, model, optimizer, criterion, device, arg)
         # save the model
-        torch.save(model.state_dict(), os.path.join(arg.model_dir, 'ms{}_{}sgd{}.pt'.format(arg.arch, arg.data, seed)))
+        torch.save(model.state_dict(), os.path.join(arg.model_dir, 'ms{}_{}sgd{}.pt'.format(arg.model, arg.dataset, seed)))
         print("----- end training -----")
 
     else:
         print('loading model from ckpt...')
         model.load_state_dict(torch.load(
-            os.path.join(arg.model_dir, 'ms{}_{}sgd{}.pt'.format(arg.arch, arg.data, seed))))
+            os.path.join(arg.model_dir, 'ms{}_{}sgd{}.pt'.format(arg.model, arg.dataset, seed))))
 
     index_knn_y_train = collections.defaultdict(list)
-    index_pd_train = collections.defaultdict(list)
+    index_pd_train = collections.defaultdict(int)
     knn_gt_conf_all_train = collections.defaultdict(list)
     index_knn_y_test = collections.defaultdict(list)
-    index_pd_test = collections.defaultdict(list)
+    index_pd_test = collections.defaultdict(int)
     knn_gt_conf_all_test = collections.defaultdict(list)
 
     # ------------------ training set pd ------------------
-    for k in range(model.get_num_layers()):
-        print("----- start pd for layer {} -----".format(k))
+    if not os.path.exists(os.path.join(arg.result_dir)):
+        os.makedirs(os.path.join(arg.result_dir))
+    print("----- start obtaining training set pd -----")
+    for k in tqdm(range(model.get_num_layers())):
         knn_labels, knn_conf_gt_all, indices_all = pd_util.get_knn_prds_k_layer(model, trainloader, trainloader2,
                                                                         k, arg, True)
         for idx, knn_l, knn_conf_gt in zip(indices_all, knn_labels, knn_conf_gt_all):
             index_knn_y_train[int(idx)].append(knn_l.item())
             knn_gt_conf_all_train[int(idx)].append(knn_conf_gt.item())
-        print("----- end pd for layer {} -----".format(k))
     for idx, knn_ls in index_knn_y_train.items():
-        index_pd_train[idx].append(pd_util.get_prediction_depth(knn_ls))
-    with open(os.path.join(arg.result_dir, 'ms{}train_seed{}_f{}_trainpd.json'.format(arg.arch, seed)),
+        index_pd_train[idx] = (pd_util.get_prediction_depth(knn_ls, model.get_num_layers()))
+    with open(os.path.join(arg.result_dir, 'ms{}train_seed{}_{}_trainpd.json'.format(arg.model, seed, arg.dataset)),
               'w') as f:
         json.dump(index_pd_train, f)
 
     # ------------------ testing set pd ------------------
-    for k in range(model.get_num_layers()):
-        print("----- start pd for layer {} -----".format(k))
+    print("----- start obtaining testing set pd -----")
+    for k in tqdm(range(model.get_num_layers())):
         knn_labels, knn_conf_gt_all, indices_all = pd_util.get_knn_prds_k_layer(model, testloader, testloader2,
-                                                                        k, arg, True)
+                                                                        k, arg, False)
         for idx, knn_l, knn_conf_gt in zip(indices_all, knn_labels, knn_conf_gt_all):
             index_knn_y_test[int(idx)].append(knn_l.item())
             knn_gt_conf_all_test[int(idx)].append(knn_conf_gt.item())
-        print("----- end pd for layer {} -----".format(k))
     for idx, knn_ls in index_knn_y_test.items():
-        index_pd_test[idx].append(pd_util.get_prediction_depth(knn_ls))
-    with open(os.path.join(arg.result_dir, 'ms{}train_seed{}_f{}_testpd.json'.format(arg.arch, seed)),
+        index_pd_test[idx] = (pd_util.get_prediction_depth(knn_ls, model.get_num_layers()))
+    with open(os.path.join(arg.result_dir, 'ms{}train_seed{}_{}_testpd.json'.format(arg.model, seed, arg.dataset)),
                 'w') as f:
             json.dump(index_pd_test, f)
 
 
 if __name__ == '__main__':
     arg = pd_config.parse_arguments()
-    if not arg.skip_training:
-        for seed in arg.seeds:
-            print("-------- starting seed {} --------".format(seed))
-            main(arg, seed)
+    for seed in arg.seeds:
+        print("-------- starting seed {} --------".format(seed))
+        main(arg, seed)
     train_avg_score = pd_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_trainpd.json")
     test_avg_score = pd_util.avg_result(os.path.join(os.getcwd(), arg.result_dir), "_testpd.json")
 
     if not os.path.exists(arg.result_dir + "/avg"):
         os.makedirs(arg.result_dir + "/avg")
 
-    with open(os.path.join(arg.result_dir, 'avg', 'ms{}train_f{}_avg.json'.format(arg.arch, arg.data)), 'w') as f:
+    with open(os.path.join(arg.result_dir, 'avg', 'ms{}train_{}_avg.json'.format(arg.model, arg.dataset)), 'w') as f:
         json.dump(train_avg_score, f)
-    with open(os.path.join(arg.result_dir, 'avg', 'ms{}test_f{}_avg.json'.format(arg.arch, arg.data)), 'w') as f:
+    with open(os.path.join(arg.result_dir, 'avg', 'ms{}test_{}_avg.json'.format(arg.model, arg.dataset)), 'w') as f:
         json.dump(test_avg_score, f)
