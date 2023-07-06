@@ -159,7 +159,7 @@ if __name__ == '__main__':
     if not os.path.exists(arg.result_dir + "/avg"):
         os.makedirs(arg.result_dir + "/avg")
 
-    with open(os.path.join(arg.result_dir, 'avg', 'ms{}train_{}_avg.json'.format(arg.model, arg.dataset)), 'w') as f:
+    with open(os.path.join(arg.result_dir, 'avg', '{}-{}-pd_metric_train_avg.json'.format(arg.dataset, arg.model)), 'w') as f:
         json.dump(train_avg_score, f)
-    with open(os.path.join(arg.result_dir, 'avg', 'ms{}test_{}_avg.json'.format(arg.model, arg.dataset)), 'w') as f:
+    with open(os.path.join(arg.result_dir, 'avg', '{}-{}-pd_metric_test_avg.json'.format(arg.dataset, arg.model)), 'w') as f:
         json.dump(test_avg_score, f)
