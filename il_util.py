@@ -2,7 +2,7 @@ import os
 import numpy as np
 import json
 
-def avg_result(dir, file_suf='.json'):
+def avg_result(dir, file_suf='.json', roundToInt=False):
     """
     This function is used to average the results of an datapoint hardness metric across different seeds.
     :param dir: directory of the results
@@ -24,6 +24,9 @@ def avg_result(dir, file_suf='.json'):
         for i in pd_dict.keys():
             pd_avg_dict[int(i)] = pd_avg_dict.get(int(i)) + pd_dict[i] if (int(i) in pd_avg_dict.keys()) else pd_dict[i]
     for i in pd_avg_dict.keys():
-        pd_avg_dict[i] = pd_avg_dict[i] / len(pd_dict_list)
+        if not roundToInt:
+            pd_avg_dict[i] = pd_avg_dict[i] / len(pd_dict_list)
+        else:
+            pd_avg_dict[i] = int(pd_avg_dict[i] / len(pd_dict_list))
 
     return pd_avg_dict

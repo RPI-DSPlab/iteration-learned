@@ -32,18 +32,19 @@ def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, opt
             curr_iteration += 1
             if args.learned_metric == "iteration":  # if we are using iteration learned metric
                 model.eval()
-                for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
-                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
-                    outputs_inf = model(imgs_inf)
-                    _, predicted_inf = torch.max(outputs_inf.data, 1)
-                    for i in range(len(idx_inf)):
-                        learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
-                for (imgs_inf, labels_inf), idx_inf in testloader_inf:
-                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
-                    outputs_inf = model(imgs_inf)
-                    _, predicted_inf = torch.max(outputs_inf.data, 1)
-                    for i in range(len(idx_inf)):
-                        learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                with torch.no_grad():
+                    for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
+                        imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
+                        outputs_inf = model(imgs_inf)
+                        _, predicted_inf = torch.max(outputs_inf.data, 1)
+                        for i in range(len(idx_inf)):
+                            learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                    for (imgs_inf, labels_inf), idx_inf in testloader_inf:
+                        imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
+                        outputs_inf = model(imgs_inf)
+                        _, predicted_inf = torch.max(outputs_inf.data, 1)
+                        for i in range(len(idx_inf)):
+                            learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
                 model.train()
 
         cos_scheduler.step()
@@ -56,18 +57,19 @@ def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, opt
 
         if args.learned_metric == "epoch":  # if we are using epoch learned metric
             model.eval()
-            for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
-                imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
-                outputs_inf = model(imgs_inf)
-                _, predicted_inf = torch.max(outputs_inf.data, 1)
-                for i in range(len(idx_inf)):
-                    learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
-            for (imgs_inf, labels_inf), idx_inf in testloader_inf:
-                imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
-                outputs_inf = model(imgs_inf)
-                _, predicted_inf = torch.max(outputs_inf.data, 1)
-                for i in range(len(idx_inf)):
-                    learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+            with torch.no_grad():
+                for (imgs_inf, labels_inf), idx_inf in trainloader_inf:
+                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
+                    outputs_inf = model(imgs_inf)
+                    _, predicted_inf = torch.max(outputs_inf.data, 1)
+                    for i in range(len(idx_inf)):
+                        learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                for (imgs_inf, labels_inf), idx_inf in testloader_inf:
+                    imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
+                    outputs_inf = model(imgs_inf)
+                    _, predicted_inf = torch.max(outputs_inf.data, 1)
+                    for i in range(len(idx_inf)):
+                        learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
             model.train()
         if curr_iteration > args.iterations:
             break
@@ -109,7 +111,7 @@ def main(arg, seed=1234):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     # loading the dataset, note that trainloader_inf and testloader_inf are for inference for the learned metric
-    train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, val_split = dataset.get_dataset(arg)
+    train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, val_split = dataset.getDataset(arg)
 
     if arg.dataset == "cifar10":
         ecd = vgg16().features

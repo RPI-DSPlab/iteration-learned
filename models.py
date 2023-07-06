@@ -44,3 +44,8 @@ class VGGPD(nn.Module):
         else:
             return logits
 
+    def get_num_layers(self):
+        """
+        :return: number of layers in the encoder
+        """
+        return 14

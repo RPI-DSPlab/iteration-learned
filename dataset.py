@@ -3,8 +3,9 @@ from torchvision.datasets import MNIST, CIFAR10
 from sklearn.model_selection import train_test_split
 import numpy as np
 from torch.utils.data import Dataset, DataLoader, Subset
+import torch
 
-def get_dataset(arg):
+def getDataset(arg):
     """
     :param config: the configuration file
     :return: trainloader, testloader, valloader
