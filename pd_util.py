@@ -88,7 +88,7 @@ def _get_feature_bank_from_kth_layer(model, dataloader, k, args):
     return fms, all_label  # somehow, the shape of fms is (number of image) * (it's feature map size)
 
 
-def get_knn_prds_k_layer(model, evaloader, floader, k, args, train_split=True):
+def get_knn_prds_k_layer(model, evaloader, floader, k, args, rm_top=True):
     """
     Get the knn predictions for the kth layer
     :param model: the model
@@ -121,7 +121,7 @@ def get_knn_prds_k_layer(model, evaloader, floader, k, args, train_split=True):
             We want to use information from the support set (f_bank) to predict the label of the image (inp_f_curr)
             """
             knn_scores = knn_predict(inp_f_curr, f_bank, all_labels, classes=nm_cls, knn_k=args.knn_k, knn_t=1,
-                                     rm_top1=train_split)  # B x C
+                                     rm_top1=rm_top)  # B x C
             knn_probs = F.normalize(knn_scores, p=1, dim=1)
             knn_labels_prd = knn_probs.argmax(1)
             knn_conf_gt = knn_probs.gather(dim=1, index=labels_b[:, None])  # B x 1

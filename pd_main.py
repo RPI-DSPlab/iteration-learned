@@ -137,7 +137,7 @@ def main(arg, seed=1234):
     print("----- start obtaining testing set pd -----")
     for k in tqdm(range(model.get_num_layers())):
         knn_labels, knn_conf_gt_all, indices_all = pd_util.get_knn_prds_k_layer(model, testloader, testloader2,
-                                                                        k, arg, False)
+                                                                        k, arg, True)
         for idx, knn_l, knn_conf_gt in zip(indices_all, knn_labels, knn_conf_gt_all):
             index_knn_y_test[int(idx)].append(knn_l.item())
             knn_gt_conf_all_test[int(idx)].append(knn_conf_gt.item())

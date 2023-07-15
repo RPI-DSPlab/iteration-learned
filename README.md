@@ -1,4 +1,17 @@
+# Iteration (Epoch) Learned, Prediction Depth, and Consistency Score
+
+THis repo consists of the implementation of the metrics: **Iteration (Epoch) Learned**, **Prediction Depth**, and **Consistency Score**.
+All of these are built on the same structure, which is to predict the same dataset with the same model and store the 
+score in the same format for better comparison.
+
+`dadtaset.py` has dataset loaders for CIFAR10
+
+`model.py` has the implementation of vgg16
+
 # Iteration (Epoch) Learned
+
+The corresponding files are `il_main.py` `il_util.py` `il_config.py`.
+
 Iteration (Epoch) learned is a metric of example difficulty.
 It is proposed in the paper: [An Empirical Study of Example Forgetting during Deep Neural Network Learning](https://arxiv.org/abs/1812.05159) by the authors defining **Forgetting and learning events**.
 
@@ -21,7 +34,6 @@ predictions at all iterations $t ≥ \tau$ are equal to the final prediction of 
 points consistently classified after all training steps and at the moment of initialization, are said to be
 learned in step $t = 0$.
 
-This defination 
 
 # Implementation:
 
