@@ -5,7 +5,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader, Subset
 import torch
 
-def getDataset(arg):
+def getDataset(arg, subset=False):
     """
     :param config: the configuration file
     :return: trainloader, testloader, valloader
@@ -32,18 +32,27 @@ def getDataset(arg):
                 img, target = super(CIFAR10withIndex, self).__getitem__(index)
                 return (img, target), index
 
-        trainset = CIFAR10withIndex('./', transform=train_transform, train=True, download=True)
-        testset = CIFAR10withIndex('./', transform=test_transform, train=False, download=True)
+        trainset = CIFAR10withIndex('./', transform=train_transform, train=True, download=False)
+        testset = CIFAR10withIndex('./', transform=test_transform, train=False, download=False)
 
         train_indices, val_indices = train_test_split(np.arange(arg.num_samples), train_size=arg.train_ratio,
                                                       test_size=(1 - arg.train_ratio))
 
-        val_split = Subset(trainset, val_indices)
-        train_split = Subset(trainset, train_indices)
-        trainloader = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-        trainloader2 = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-        testloader = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
-        testloader2 = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+        if type(subset) == bool and subset == False:
+            val_split = Subset(trainset, val_indices)
+            train_split = Subset(trainset, train_indices)
+            trainloader = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
+            trainloader2 = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
+            testloader = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            testloader2 = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            return trainset, testset, trainloader, testloader, trainloader2, testloader2, val_split
+        else:
+            subset_indices = subset  # if subset is not None, it should be a list of indices
+            subset_train = Subset(trainset, subset_indices)
+            subset_test = Subset(testset, subset_indices)
+            trainloader = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
+            trainloader2 = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
+            testloader = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            testloader2 = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            return trainset, testset, trainloader, testloader, trainloader2, testloader2
 
-
-        return trainset, testset, trainloader, testloader, trainloader2, testloader2, val_split
