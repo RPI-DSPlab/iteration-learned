@@ -19,8 +19,14 @@ def subset_train(seed, device, subset_ratio, config):
         num_train_total = 50000
     num_train = int(num_train_total * subset_ratio)
 
-    subset_indices = torch.randperm(num_train_total)[:num_train]
-    train_loader = getDataset(config, subset=subset_indices)[2]  # we only need the train loader
+    indices = torch.randperm(num_train_total)
+
+    train_subset_indices = indices[:num_train]  # used in training
+    # held-out example, we get c-scores on this
+    test_subset_indices = indices[num_train:]
+
+    train_loader = getDataset(config, subset=train_subset_indices)[2]  # we only need the train loader
+    test_loader = getDataset(config, subset=test_subset_indices)[2]  # we only need the train loader
 
     if config.dataset == "cifar10":
         ecd = vgg16().features
@@ -58,17 +64,18 @@ def subset_train(seed, device, subset_ratio, config):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
             training_acc.append(correct / total)
+        model.train()
 
     trainset_mask = torch.zeros(num_train_total, dtype=torch.bool)
-    trainset_mask[subset_indices] = True
+    trainset_mask[test_subset_indices] = True
 
     trainset_correctness = {}
 
     model.eval()
     with torch.no_grad():
-        for idx in subset_indices:
+        for idx in test_subset_indices:
             trainset_correctness[idx.item()] = 0
-        for (imgs, labels), idx in train_loader:
+        for (imgs, labels), idx in test_loader:
             imgs, labels = imgs.cuda(non_blocking=True), labels.cuda(non_blocking=True)
             outputs = model(imgs)
             _, predicted = torch.max(outputs.data, 1)

@@ -20,13 +20,13 @@ def parse_arguments():
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes')
     parser.add_argument('--crit', type=str, default='cross_entropy', help='Loss criterion')
     parser.add_argument('--learned_metric', type=str, default='epoch', help='Iteration Learned or Epoch Learned')
-    parser.add_argument('--batch_size', type=int, default=1000, help="batch size")
+    parser.add_argument('--batch_size', type=int, default=5000, help="batch size")
 
     # Other configurations
     parser.add_argument('--seed', type=int, default=9203, help='Seed value')
     parser.add_argument('--result_dir', type=str, default='cs_results', help='Result directory')
     parser.add_argument('--save_result', type=bool, default=True, help='Save results')
     parser.add_argument('--n_runs', type=int, default=200, help='Number of runs')
-    parser.add_argument('--ss_ratio', type=float, default=0.1, help='Ratio of subset set')
+    parser.add_argument('--ss_ratio', type=float, default=0.9, help='Ratio of subset set')
 
     return parser.parse_args()
