@@ -41,18 +41,18 @@ def getDataset(arg, subset=False):
         if type(subset) == bool and subset == False:
             val_split = Subset(trainset, val_indices)
             train_split = Subset(trainset, train_indices)
-            trainloader = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-            trainloader2 = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-            testloader = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
-            testloader2 = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            trainloader = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=4, pin_memory=True)
+            trainloader2 = DataLoader(train_split, batch_size=1000, shuffle=True, num_workers=4, pin_memory=True)
+            testloader = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
+            testloader2 = DataLoader(testset, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
             return trainset, testset, trainloader, testloader, trainloader2, testloader2, val_split
         else:
             subset_indices = subset  # if subset is not None, it should be a list of indices
             subset_train = Subset(trainset, subset_indices)
             subset_test = Subset(testset, subset_indices)
-            trainloader = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-            trainloader2 = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=2, pin_memory=True)
-            testloader = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
-            testloader2 = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=2, pin_memory=True)
+            trainloader = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=4, pin_memory=True)
+            trainloader2 = DataLoader(subset_train, batch_size=1000, shuffle=True, num_workers=4, pin_memory=True)
+            testloader = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
+            testloader2 = DataLoader(subset_test, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
             return trainset, testset, trainloader, testloader, trainloader2, testloader2
 
