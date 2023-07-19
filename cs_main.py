@@ -83,9 +83,14 @@ def estimate_cscores(config, device):
                 train_correctness_sum[idx] += 1
 
     cscores = {}
+
+    avg_train_rep_list = []
     for idx in train_rep:
         cscores[idx] = train_correctness_sum[idx] / train_rep[idx]
+        avg_train_rep_list.append(train_rep[idx])
+    avg_train_rep = sum(avg_train_rep_list) / len(avg_train_rep_list)
 
+    print(f"-----\n the average number of times each image is predicted is {avg_train_rep}\nwith min={min(avg_train_rep_list)} and max={max(avg_train_rep_list)}\n-----")
     return cscores
 
 
@@ -96,7 +101,7 @@ def main(config):
     if config.save_result:
         if not os.path.exists(config.result_dir):
             os.makedirs(config.result_dir)
-        with open(os.path.join(config.result_dir, "run{}_{}_trainratio{}_traincs.json".format(config.n_runs, config.dataset, config.ss_ratio)), "w") as f:
+        with open(os.path.join(config.result_dir, "cs_run{}_{}_trainratio{}_train_avg.json".format(config.n_runs, config.dataset, config.ss_ratio)), "w") as f:
             json.dump(cscores, f)
 
 
