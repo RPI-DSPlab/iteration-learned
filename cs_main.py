@@ -38,7 +38,7 @@ def subset_train(seed, device, subset_ratio, config):
 
     training_acc = []
 
-    for epoch in range(config.num_epochs):
+    for epoch in tqdm(range(config.num_epochs), desc="Epochs"):
         for (imgs, labels), idx in train_loader:
             imgs, labels = imgs.cuda(non_blocking=True), labels.cuda(non_blocking=True)
             optimizer.zero_grad()

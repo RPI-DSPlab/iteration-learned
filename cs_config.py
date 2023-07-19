@@ -27,6 +27,6 @@ def parse_arguments():
     parser.add_argument('--result_dir', type=str, default='cs_results', help='Result directory')
     parser.add_argument('--save_result', type=bool, default=True, help='Save results')
     parser.add_argument('--n_runs', type=int, default=200, help='Number of runs')
-    parser.add_argument('--ss_ratio', type=float, default=0.4, help='Ratio of support set')
+    parser.add_argument('--ss_ratio', type=float, default=0.1, help='Ratio of subset set')
 
     return parser.parse_args()

@@ -32,8 +32,8 @@ def getDataset(arg, subset=False):
                 img, target = super(CIFAR10withIndex, self).__getitem__(index)
                 return (img, target), index
 
-        trainset = CIFAR10withIndex('./', transform=train_transform, train=True, download=True)
-        testset = CIFAR10withIndex('./', transform=test_transform, train=False, download=True)
+        trainset = CIFAR10withIndex('./', transform=train_transform, train=True, download=False)
+        testset = CIFAR10withIndex('./', transform=test_transform, train=False, download=False)
 
         train_indices, val_indices = train_test_split(np.arange(arg.num_samples), train_size=arg.train_ratio,
                                                       test_size=(1 - arg.train_ratio))
