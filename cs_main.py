@@ -36,6 +36,8 @@ def subset_train(seed, device, subset_ratio, config):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9, weight_decay=5e-4)
 
+    training_acc = []
+
     for epoch in range(config.num_epochs):
         for (imgs, labels), idx in train_loader:
             imgs, labels = imgs.cuda(non_blocking=True), labels.cuda(non_blocking=True)
@@ -45,10 +47,23 @@ def subset_train(seed, device, subset_ratio, config):
             loss.backward()
             optimizer.step()
 
+        model.eval()
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for (imgs, labels), idx in train_loader:
+                imgs, labels = imgs.cuda(non_blocking=True), labels.cuda(non_blocking=True)
+                outputs = model(imgs)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+            training_acc.append(correct / total)
+
     trainset_mask = torch.zeros(num_train_total, dtype=torch.bool)
     trainset_mask[subset_indices] = True
 
     trainset_correctness = {}
+
     model.eval()
     with torch.no_grad():
         for idx in subset_indices:
@@ -60,6 +75,10 @@ def subset_train(seed, device, subset_ratio, config):
             for i in range(len(predicted)):
                 if predicted[i] == labels[i]:
                     trainset_correctness[idx[i].item()] = 1
+
+    subset_acc = sum(trainset_correctness.values()) / len(trainset_correctness)
+    print(f"Subset Accuracy: {subset_acc:.4f}")
+    print(f"Training Accuracy: {training_acc[-1]:.4f}")
     return trainset_correctness
 
 
@@ -68,7 +87,8 @@ def estimate_cscores(config, device):
     ss_ratio = config.ss_ratio  # subset ratio
 
     results = []
-    for i_run in tqdm(range(n_runs), desc=f'SS Ratio={ss_ratio:.2f}'):
+    for i_run in range(n_runs):
+        print(f'Run {i_run + 1}/{n_runs} ----------------------------------')
         results.append(subset_train(config.seed, device, ss_ratio, config))
 
     train_rep = {}  # number of times each image is predicted in the loop above
