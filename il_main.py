@@ -9,7 +9,9 @@ import dataset
 import time
 import il_util
 
-def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, args):
+
+def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device,
+            learning_history_train_dict, learning_history_test_dict, args):
     curr_iteration = 0
     cos_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)
     history = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
@@ -38,13 +40,15 @@ def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, opt
                         outputs_inf = model(imgs_inf)
                         _, predicted_inf = torch.max(outputs_inf.data, 1)
                         for i in range(len(idx_inf)):
-                            learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                            learning_history_train_dict[idx_inf[i].item()].append(
+                                labels_inf[i].item() == predicted_inf[i].item())
                     for (imgs_inf, labels_inf), idx_inf in testloader_inf:
                         imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                         outputs_inf = model(imgs_inf)
                         _, predicted_inf = torch.max(outputs_inf.data, 1)
                         for i in range(len(idx_inf)):
-                            learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                            learning_history_test_dict[idx_inf[i].item()].append(
+                                labels_inf[i].item() == predicted_inf[i].item())
                 model.train()
 
         cos_scheduler.step()
@@ -63,21 +67,23 @@ def trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, opt
                     outputs_inf = model(imgs_inf)
                     _, predicted_inf = torch.max(outputs_inf.data, 1)
                     for i in range(len(idx_inf)):
-                        learning_history_train_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                        learning_history_train_dict[idx_inf[i].item()].append(
+                            labels_inf[i].item() == predicted_inf[i].item())
                 for (imgs_inf, labels_inf), idx_inf in testloader_inf:
                     imgs_inf, labels_inf = imgs_inf.cuda(non_blocking=True), labels_inf.cuda(non_blocking=True)
                     outputs_inf = model(imgs_inf)
                     _, predicted_inf = torch.max(outputs_inf.data, 1)
                     for i in range(len(idx_inf)):
-                        learning_history_test_dict[idx_inf[i].item()].append(labels_inf[i].item() == predicted_inf[i].item())
+                        learning_history_test_dict[idx_inf[i].item()].append(
+                            labels_inf[i].item() == predicted_inf[i].item())
             model.train()
-        if curr_iteration > args.iterations:
-            break
         end_time_after_inference = time.time()
         if epoch % 20 == 0:
-            print('Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
-              '{:.6f}'.format(epoch, train_loss, train_acc, end_time_train - start_time_train,
-                              end_time_after_inference - end_time_train))
+            print(
+                'Epoch: {} \tTraining Loss: {:.6f} \tTraining Accuracy: {:.2f}, training time: {:.2f}, inference time: '
+                '{:.6f}'.format(epoch, train_loss, train_acc, end_time_train - start_time_train,
+                                end_time_after_inference - end_time_train))
+
 
 def determineLearnedMetric(learning_history_dict):
     """
@@ -107,11 +113,12 @@ def determineLearnedMetric(learning_history_dict):
 
     return learned_metric_dict
 
+
 def main(arg, seed=1234):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     # loading the dataset, note that trainloader_inf and testloader_inf are for inference for the learned metric
-    train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf, val_split = dataset.getDataset(arg)
+    train_set, test_set, trainloader, testloader, trainloader_inf, testloader_inf = dataset.getDataset(arg)
 
     if arg.dataset == "cifar10":
         ecd = vgg16().features
@@ -139,17 +146,20 @@ def main(arg, seed=1234):
     a data point is either correctly classified or misclassified. This directory will be further used to determine the 
     iteration learned or epoch learned metric"""
     learning_history_train_dict = {}
+    count = 0
     for _, idx in trainloader_inf:
         for i in idx:
+            count += 1
             learning_history_train_dict[i.item()] = list()
     learning_history_test_dict = {}
     for _, idx in testloader_inf:
         for i in idx:
             learning_history_test_dict[i.item()] = list()
 
-
     print("----- start training -----")
-    trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device, learning_history_train_dict, learning_history_test_dict, arg)
+    trainer(trainloader, testloader, trainloader_inf, testloader_inf, model, optimizer, criterion, device,
+            learning_history_train_dict, learning_history_test_dict, arg)
+
     learned_metric_train = determineLearnedMetric(learning_history_train_dict)
     learned_metric_test = determineLearnedMetric(learning_history_test_dict)
 
@@ -162,20 +172,23 @@ def main(arg, seed=1234):
 
         if arg.learned_metric == "iteration":
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_iteration_seed{}_train.json".format(arg.dataset
-                                   ,arg.model, seed)), "w") as f:
+                    , arg.model, seed)), "w") as f:
                 json.dump(learned_metric_train, f)
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_iteration_seed{}_test.json".format(arg.dataset
-                                   ,arg.model, seed)), "w") as f:
+            with open(os.path.join(arg.result_dir,
+                                   "{}-{}-learned_metric_test_iteration_seed{}_test.json".format(arg.dataset
+                                       , arg.model, seed)), "w") as f:
                 json.dump(learned_metric_test, f)
         elif arg.learned_metric == "epoch":
-            with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
-                                   ,arg.model, seed)), "w") as f:
+            with open(
+                    os.path.join(arg.result_dir, "{}-{}-learned_metric_train_epoch_seed{}_train.json".format(arg.dataset
+                        , arg.model, seed)), "w") as f:
                 json.dump(learned_metric_train, f)
             with open(os.path.join(arg.result_dir, "{}-{}-learned_metric_test_epoch_seed{}_test.json".format(arg.dataset
-                                   ,arg.model, seed)), "w") as f:
+                    , arg.model, seed)), "w") as f:
                 json.dump(learned_metric_test, f)
         else:
             raise NotImplementedError
+
 
 if __name__ == '__main__':
     arg = il_config.parse_arguments()
@@ -190,18 +203,22 @@ if __name__ == '__main__':
         os.makedirs(arg.result_dir + "/avg")
 
     if arg.learned_metric == "iteration":
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_train_avg.json".format(arg.dataset
-                               ,arg.model)), "w") as f:
+        with open(
+                os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_train_avg.json".format(arg.dataset
+                    , arg.model)), "w") as f:
             json.dump(train_avg_score, f)
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_test_avg.json".format(arg.dataset
-                               ,arg.model)), "w") as f:
+        with open(
+                os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_iteration_test_avg.json".format(arg.dataset
+                    , arg.model)), "w") as f:
             json.dump(test_avg_score, f)
     elif arg.learned_metric == "epoch":
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_train_epoch_train_avg.json".format(arg.dataset
-                               ,arg.model)), "w") as f:
+        with open(os.path.join(arg.result_dir + "/avg",
+                               "{}-{}-learned_metric_train_epoch_train_avg.json".format(arg.dataset
+                                   , arg.model)), "w") as f:
             json.dump(train_avg_score, f)
-        with open(os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_test_avg.json".format(arg.dataset
-                               ,arg.model)), "w") as f:
+        with open(
+                os.path.join(arg.result_dir + "/avg", "{}-{}-learned_metric_test_epoch_test_avg.json".format(arg.dataset
+                    , arg.model)), "w") as f:
             json.dump(test_avg_score, f)
     else:
         raise NotImplementedError

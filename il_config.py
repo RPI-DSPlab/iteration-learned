@@ -22,6 +22,7 @@ def parse_arguments():
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes')
     parser.add_argument('--crit', type=str, default='cross_entropy', help='Loss criterion')
     parser.add_argument('--learned_metric', type=str, default='epoch', help='Iteration Learned or Epoch Learned')
+    parser.add_argument('--batch_size', type=int, default=5000, help="batch size")
 
     # Other configurations
     parser.add_argument('--seeds', nargs='+', type=int, default=[9203, 9304, 3456, 5210],

@@ -18,6 +18,7 @@ def parse_arguments():
                         help='use amp if GPU memory is 15 GB; set to False if GPU memory is 32 GB ')
 
     # Training
+    parser.add_argument('--batch_size', type=int, default=5000, help="batch size")
     parser.add_argument('--learning_rate', type=float, default=0.04, help='Learning rate')
     parser.add_argument('--iterations', type=int, default=15000, help='Number of iterations')
     parser.add_argument('--num_epochs', type=int, default=250, help='Number of epochs')

@@ -30,7 +30,6 @@ def knn_predict(feature, feature_bank, feature_labels, classes, knn_k, knn_t, rm
     K: number of pts in the feature bank (ie 5000)
     """
 
-
     if dist == 'l2':
         knn_dist = 2
 
@@ -101,7 +100,8 @@ def get_knn_prds_k_layer(model, evaloader, floader, k, args, rm_top=True):
     indices_all = []
 
     f_bank, all_labels = _get_feature_bank_from_kth_layer(model, floader,
-                                                          k, args)  # get the feature bank and all labels for the support set
+                                                          k,
+                                                          args)  # get the feature bank and all labels for the support set
     f_bank = f_bank.t().contiguous()
     with torch.no_grad():
         for j, ((imgs, labels), idx) in enumerate(evaloader):
@@ -145,6 +145,7 @@ def get_prediction_depth(knn_labels_all, max_prediction_depth):
     while knn_labels_all[pd] == knn_labels_all[0] and pd <= max_prediction_depth - 2:
         pd += 1
     return max_prediction_depth - pd
+
 
 def avg_result(dir, file_suf='.json', roundToInt=False):
     """

@@ -40,7 +40,6 @@ def trainer(trainloader, testloader, model, optimizer, criterion, device, args):
 
         end_time_train = time.time()
         with torch.no_grad():
-
             test_acc = 0
             test_loss = 0
             for (imgs, labels), idx in testloader:
@@ -72,7 +71,7 @@ def main(arg, seed=1234):
     np.random.seed(seed)
     """trainloader and testloader are the dataloaders for the training and testing sets respectively
     trainloader2 and testloader2 are the dataloaders for predicting the depth"""
-    _, _, trainloader, testloader, trainloader2, testloader2, val_split = dataset.getDataset(arg)
+    _, _, trainloader, testloader, trainloader2, testloader2 = dataset.getDataset(arg)
 
     if arg.dataset == "cifar10":
         ecd = vgg16().features
