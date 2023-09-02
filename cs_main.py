@@ -96,7 +96,9 @@ def estimate_cscores(config, device):
     results = []
     for i_run in range(n_runs):
         print(f'Run {i_run + 1}/{n_runs} ----------------------------------')
-        results.append(subset_train(config.seed, device, ss_ratio, config))
+        # note that the seed is set as config.seed + i_run since we want to have different seeds for different runs
+        # so the sunsetting of the training is not the same for different runs
+        results.append(subset_train(config.seed + i_run, device, ss_ratio, config))
 
     train_rep = {}  # number of times each image is predicted in the loop above
     train_correctness_sum = {}  # sum of correctly prediction for each image in the loop above
@@ -124,10 +126,16 @@ def estimate_cscores(config, device):
 def main(config):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
-    cscores = estimate_cscores(config, device)
     if config.save_result:
         if not os.path.exists(config.result_dir):
             os.makedirs(config.result_dir)
+
+        if not os.path.exists(config.result_dir + "/model_results"):  # this is for saving the partial results from each trained model
+            os.makedirs(config.result_dir + "/model_results")
+
+    cscores = estimate_cscores(config, device)
+
+    if config.save_result:
         with open(os.path.join(config.result_dir, "cs_run{}_{}_trainratio{}_train_avg.json".format(config.n_runs, config.dataset, config.ss_ratio)), "w") as f:
             json.dump(cscores, f)
 
